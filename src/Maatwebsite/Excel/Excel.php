@@ -126,6 +126,41 @@ class Excel {
         return $reader;
     }
 
+
+    /**
+     *
+     *  Load an existing file synchronously
+     *
+     * @param  string        $file The file we want to load
+     * @param  callback|null $callback
+     * @param  string|null   $encoding
+     * @param  bool          $noBasePath
+     * @param  callback|null $callbackConfigReader
+     * @return LaravelExcelReader
+     */
+    public function loadSync($file, $callback = null, $encoding = null, $noBasePath = false, $callbackConfigReader = null)
+    {
+        // Reader instance
+        $reader = clone $this->reader;
+
+        // Inject excel object
+        $reader->injectExcel($this->excel);
+
+        // Enable filters
+        $reader->setFilters($this->filters);
+
+        // Set the encoding
+        $encoding = is_string($callback) ? $callback : $encoding;
+
+        // Start loading
+        $reader->load($file, $encoding, $noBasePath, $callbackConfigReader);
+
+        // Do the callback
+        if ($callback instanceof Closure)
+            return call_user_func($callback, $reader);
+
+    }
+
     /**
      * Set select sheets
      * @param  $sheets
